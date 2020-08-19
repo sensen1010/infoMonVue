@@ -9,20 +9,27 @@
   <el-col :span="10"><div class="grid-content bg-purple"><p></p></div></el-col>
 </el-row> -->
  <el-row>
-  <el-col :span="7"><div class="grid-content bg-purple"><p></p></div></el-col>
+  <el-col :span="5"><div class="grid-content bg-purple"><p></p></div></el-col>
   <el-col :span="4">
-     <el-button  style="width:100%;height:200px">前端更新</el-button>
+     <el-button  style="width:100%;height:200px"  @click="client('FRONT')">前端更新</el-button>
   </el-col>
-  <el-col :span="2">
+  <el-col :span="1">
     <p></p>
   </el-col>
   <el-col :span="4">
-      <el-button  style="width:100%;height:200px" @click="client()">后端更新</el-button>
+      <el-button  style="width:100%;height:200px" @click="client('BACK')">后端更新</el-button>
   </el-col>
-  <el-col :span="7"><div class="grid-content bg-purple"><p></p></div></el-col>
+   <el-col :span="1">
+    <p></p>
+  </el-col>
+  <el-col :span="4">
+      <el-button  style="width:100%;height:200px" @click="client('APK')">安卓更新</el-button>
+  </el-col>
+  <el-col :span="5"><div class="grid-content bg-purple"><p></p></div></el-col>
 </el-row>
 </div>
  <el-row v-if="clientShow" class="clientDiv">
+  <el-header>{{typeText}}</el-header>
   <el-col :span="14">
     <el-main>
     <el-table
@@ -34,23 +41,18 @@
     style="width: 100%"
     >
     <el-table-column
-      prop="apkMd5"
-      label="apkMd5"
+      prop="softMd5"
+      label="软件Md5"
       >
     </el-table-column>
     <el-table-column
-      prop="apkName"
-      label="apk名称"
+      prop="softName"
+      label="软件名称"
       >
     </el-table-column>
     <el-table-column
-      prop="apkSize"
-      label="apk大小"
-      >
-    </el-table-column>
-    <el-table-column
-      prop="modifyContent"
-      label="更新说明"
+      prop="softSize"
+      label="软件大小"
       >
     </el-table-column>
     <el-table-column
@@ -70,7 +72,9 @@
       :total="pagetotal">
     </el-pagination>
   </div>
-   </el-main></el-col>
+   </el-main>
+   
+   </el-col>
   <el-col :span="10" class="upFileDiv">
 <el-form ref="form" :model="form" label-width="80px">
   <el-form-item label="选择文件">
@@ -86,11 +90,8 @@
       :auto-upload="false"
       >
       <el-button size="small" type="primary">点击上传</el-button>
-      <div slot="tip" class="el-upload__tip">只能上传apk文件</div>
+      <div slot="tip" class="el-upload__tip" v-text="showTypeText"></div>
     </el-upload>
-  </el-form-item>
-  <el-form-item label="更新描述">
-    <el-input type="textarea" v-model="form.modifyContent" class="text"></el-input>
   </el-form-item>
   <el-form-item>
     <el-button type="primary" @click="submitUpload">发布更新</el-button>
@@ -109,22 +110,38 @@ export default {
             pageSize:10,
             pagetotal:0,
             currentPage:1,
+            showType:"",
+            typeText:"",
+            showTypeText:"",
             clientShow:false,
             upFileUrl:this.GLOBAL.serverSrc,
             fileList:[],
             tableData:[],
             form: {
-              modifyContent:'1、更新描述1\n2、更新描述2\n3、........'
+               type:'BACK'
             }
             
         }
     },
     activated() {
-      this.selectUpdate();
+     
     },
     methods:{
-      client(){
+      client(val){
+        if(val=="BACK"){
+          this.showTypeText="只能上传war压缩文件";
+          this.typeText="后端更新"
+        }else if(val=="FRONT"){
+          this.showTypeText="只能上传zip压缩文件";
+           this.typeText="前端更新"
+        }else{
+          this.showTypeText="只能上传apk文件";
+           this.typeText="安卓更新"
+        }
+        this.showType=val;
+        this.form.type=val;
         this.clientShow=true;
+         this.selectUpdate();
       },
        submitUpload() {
          const fileList=this.fileList;
@@ -147,7 +164,8 @@ export default {
         this.$axios.get(this.GLOBAL.serverSrc+'/clientUpdate/update',
         {
           params: {
-            page: this.currentPage - 1
+            page: this.currentPage - 1,
+            type:this.showType
           },
         }
         ).then(res=> {
@@ -178,8 +196,8 @@ export default {
 .updateDiv .updatefrom label{
     color: #ffffff;
 }
-.clientDiv{
-  padding-top: 3%; 
+.clientDiv .el-main{
+  padding: 0px 30px!important;
 }
 .clientDiv .upFileDiv{
   border: 1px solid #EBEEF5;
