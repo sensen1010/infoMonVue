@@ -120,7 +120,6 @@ export default {
             form: {
                type:'BACK'
             }
-            
         }
     },
     activated() {
