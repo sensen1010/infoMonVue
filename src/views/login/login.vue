@@ -36,6 +36,7 @@ export default {
        let formData = new FormData();
       formData.append("no", this.form.no);
       formData.append("pow", this.form.pow);
+      let _this=this;
       this.$axios
         .post(this.GLOBAL.serverSrc+"/user/login", formData)
         .then(res => {
@@ -46,14 +47,26 @@ export default {
             //const redata=JSON.parse(res.data.data);
             localStorage.setItem("token",res.data.token);
             setTimeout(() => {
+               _this.$message({
+                message: '登录成功',
+                type: 'success'
+              });
               this.$router.push('/Main/Enter'); 
             }, 1000);
           } else {
+             _this.$message({
+              message: '账号密码错误',
+              type: 'warning'
+            });
             localStorage.setItem("token","");  
           }
         })
         .catch(function(error) {
-          console.log(error);
+           _this.$message({
+              message: '服务器异常',
+              type: 'warning'
+            });
+           console.log(error);
         });
         }
     }

@@ -140,7 +140,7 @@ export default {
         this.showType=val;
         this.form.type=val;
         this.clientShow=true;
-         this.selectUpdate();
+        this.selectUpdate();
       },
        submitUpload() {
          const fileList=this.fileList;
@@ -152,11 +152,18 @@ export default {
         this.$refs.upload.submit();
       },
       filesuccess(response, file, fileList) {
-          console.log(response);
+          const code=response.code;
+          console.log(response.code);
           console.log(fileList);
           console.log(file);
           this.fileList=[]
-          this.selectUpdate();
+          if(code=="1"){
+              this.$message.error('上传失败，请检查文件类型');
+          }else{
+            this.selectUpdate();
+          }
+          
+          
      },
        //查询更新记录
       selectUpdate(){
